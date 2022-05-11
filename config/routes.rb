@@ -6,10 +6,16 @@ Rails.application.routes.draw do
   # root -> ルートディレクトリのURL名にアクセスした時にどのコントローラーのどのメソッドが処理を受け持つか割り当てるメソッド
   namespace :staff do
     root "top#index"
+    get "login"      => "sessions#new", as: :login
+    post "session"   => "sessions#create", as: :session
+    delete "session" => "sessions#destory"
+    # asはシンボルを用いてERBの中でルーティングを定義するためのもの
   end
 
   namespace :admin do
     root "top#index"
+    get "login"      => "sessions#new", as: :login
+    delete "session" => "sessions#destroy"
   end
 
   namespace :customer do

@@ -1,4 +1,4 @@
-class Staff::TopController < ApplicationController
+class Staff::TopController < Staff::Base
   def index #indexアクション
     render action: "index" #action: の意味は？
   end
