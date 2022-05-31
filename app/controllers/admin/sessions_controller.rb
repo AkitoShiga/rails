@@ -1,4 +1,6 @@
 class Admin::SessionsController < Admin::Base
+  skip_before_action :authorize
+  skip_before_action :check_timeout
 
   def new
     if current_administrator
@@ -11,7 +13,8 @@ class Admin::SessionsController < Admin::Base
 
   def create
 
-    @form = Admin::LoginForm.new(params[:admin_login_form])
+    #@form = Admin::LoginForm.new(params[:admin_login_form])
+    @form = Admin::LoginForm.new(login_form_params)
 
     if @form.email.present?
       administrator =
@@ -24,6 +27,7 @@ class Admin::SessionsController < Admin::Base
         render action: "new"
       else
         session[:administrator_id] = administrator.id
+        session[:admin_last_access_time] = Time.current
         flash.notice = "ログインしました。"
         redirect_to :admin_root
       end
@@ -31,6 +35,10 @@ class Admin::SessionsController < Admin::Base
       flash.now.alert = "メールアドレスまたはパスワードが正しくありません。"
       render action: "new"
     end
+  end
+
+  private def login_form_params
+    params.require(:admin_login_form).permit(:email, :password)
   end
 
   def destroy

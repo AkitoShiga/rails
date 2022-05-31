@@ -27,6 +27,11 @@ Rails.application.routes.draw do
       #delete "session" => "sessions#destroy"
 
       resource :session, only: [:create, :destroy]
+
+      resources :staff_members do
+        resources :staff_events, only: [ :index ]
+      end
+      resources :staff_events, only: [ :index ]
 =begin
       get    "staff_members"          => "staff_members#index", as: :admin_staff_members
       get    "staff_members/new"      => "staff_members#new",   as: :new_admin_staff_member
