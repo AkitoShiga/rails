@@ -14,6 +14,7 @@ Rails.application.routes.draw do
 
       resource :session,   only: [:create, :destroy]
       resource :account, except: [:new, :create, :destroy]
+      resource :password, only: [:show, :edit, :update]
 
       # asはシンボルを用いてERBの中でルーティングを定義するためのもの
     end
