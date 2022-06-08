@@ -3,25 +3,12 @@ class StaffMember < ApplicationRecord
   # self.table_name = "M_SHOKUIN" ApplicationRecordを継承してtable_nameを独自定義すれば任意のテーブルが使える
   # alias_attribute :section :BUMON M_SHOKUIN.BUMON属性をstaff_member.sectionという属性で定義する事が出来る
 
-  include StringNormalizer
+  include EmailHolder
+  include PersonalNameHolder
+  include PasswordHolder# インスタンスに設定しているだけで永続化はしてないんだよね？？？
+  end
 
   has_many :events, class_name: "StaffEvent", dependent: :destroy
-
-  before_validation do
-    self.email = normalize_as_email(email)
-    self.family_name      = normalize_as_name(family_name)
-    self.given_name       = normalize_as_name(given_name)
-    self.family_name_kana = normalize_as_furigana(family_name_kana)
-    self.given_name_kana  = normalize_as_furigana(given_name_kana) end
-
-  HUMAN_NAME_REGEXP = /\A[\p{han}\p{hiragana}\p{katakana}\u{30fc}A-Za-z]+\z/
-  KATAKANA_REGEXP   = /\A[\p{katakana}\u{30fc}]+\z/
-
-  validates :email, presence: true, "valid_email2/email": true, uniqueness: { case_sensitive: false }
-  validates :family_name, :given_name, presence: true,
-            format: { with: HUMAN_NAME_REGEXP, allow_blank: true }
-  validates :family_name_kana, :given_name_kana, presence: true,
-            format: { with: KATAKANA_REGEXP, allow_blank: true }
 
   validates :start_date, presence: true, date: {
     after_or_equal_to: Date.new(2000, 1, 1),
@@ -33,15 +20,6 @@ class StaffMember < ApplicationRecord
     before: -> (obj) { 1.year.from_now.to_date },
     allow_blank: true
   }
-
-  def password=(raw_password)
-    if raw_password.kind_of?(String)
-      self.hashed_password = BCrypt::Password.create(raw_password)
-    elsif raw_password.nil?
-      self.hashed_password = nil
-    end
-    # インスタンスに設定しているだけで永続化はしてないんだよね？？？
-  end
 
   def active?
     !suspended? && start_date <= Date.today &&
