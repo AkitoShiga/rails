@@ -3,7 +3,11 @@ class Staff::TopController < Staff::Base
   #skip_before_action :check_timeout
 
   def index #indexアクション
-    render action: "index" #action: の意味は？
+    if current_staff_member
+      render action: "dashboard"
+    else
+      render action: "index" #action: の意味は？
+    end
   end
 end
 # よばれたインデックス
